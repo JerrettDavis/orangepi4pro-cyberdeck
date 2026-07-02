@@ -1,0 +1,12 @@
+*.img
+*.img.*
+*.iso
+*.log
+*.tmp
+*.swp
+build/
+cache/
+downloads/
+out/
+research/private/
+
