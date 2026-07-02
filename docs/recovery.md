@@ -31,10 +31,37 @@ cp -a /home/orangepi/touchscreen-fix-src recovery-capture/touchscreen-fix-src
 - Serial console details from the A733 manual before bootloader experiments.
 - Checksums for any bootloader, kernel, DTB, rootfs, or image assets.
 
+## Codex Resume After Reboot
+
+This machine starts a detached `tmux` session for the active Codex thread at
+boot through `orangepi-codex-resume.service`.
+
+After reboot:
+
+```bash
+sudo su
+codex-attach
+```
+
+If the service did not start, run:
+
+```bash
+orangepi-codex-resume
+codex-attach
+```
+
+The service uses:
+
+```text
+/usr/local/bin/orangepi-codex-resume
+/usr/local/bin/codex-attach
+/etc/systemd/system/orangepi-codex-resume.service
+tmux session: codex-orange
+```
+
 ## Do Not Do Yet
 
 - Do not write `/dev/nvme0n1`.
 - Do not write `/dev/mtdblock0`.
 - Do not overwrite SD bootloader sectors.
 - Do not make GRUB or mainline U-Boot the only boot path.
-
