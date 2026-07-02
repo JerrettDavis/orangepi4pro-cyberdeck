@@ -32,3 +32,7 @@ Pass criteria:
 - Touch works via native HID multitouch or `qdtech-touch-x11` fallback.
 - Networking, SSH, time sync, package manager, USB input, and NVMe are healthy.
 
+Known current caveat: on the NVMe baseline, `timedatectl` can fail with
+`Failed to read RTC: Invalid argument`. Treat that as a warning until RTC support
+is fixed in board support; do not block NVMe boot validation on it when network
+and wall clock are otherwise sane.

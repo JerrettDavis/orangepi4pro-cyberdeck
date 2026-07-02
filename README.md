@@ -6,14 +6,13 @@ cyberdeck.
 Current target board:
 
 - Device tree compatible: `xunlong,orangepi-4-pro`, `arm,sun60iw2p1`
-- Current recovery OS: Orange Pi Ubuntu Jammy on SD
-- Current kernel: `5.15.147-sun60iw2`
+- Current primary OS: Orange Pi Ubuntu Jammy cloned to NVMe
+- Current kernel: `5.15.147-sun60iw2-cyberdeck`
 - M.2 target: `/dev/nvme0n1`, Fanxiang S500Pro 256GB
 
-This repository is intentionally documentation-first. Installation to M.2 is
-not performed from this repo; destructive actions belong in reviewed scripts in
-`orangepi4pro-images` and must remain disabled until the recovery checklist is
-complete.
+This repository is intentionally documentation-first. Rootfs/image operations
+belong in `orangepi4pro-images`; kernel, DTS, display, touch, and hardware
+support belong in `orangepi4pro-board-support`.
 
 ## Repositories
 
@@ -24,9 +23,22 @@ complete.
 
 ## Safety Rules
 
-- Keep the current SD card bootable as recovery.
-- Do not write bootloader sectors, SPI, eMMC, or NVMe in planning sessions.
+- Keep the SD card usable as removable recovery media when practical.
+- Do not write bootloader sectors, SPI, or MTD firmware without a verified
+  backup and rollback path.
 - Treat vendor U-Boot as legacy until `booti`, EFI, extlinux, and boot scripts
   are tested on removable/recoverable media.
 - Prefer official distro repositories for userspace.
 
+## Validation
+
+Run before pushing:
+
+```bash
+scripts/ci-checks.sh
+```
+
+## Releases
+
+Push a `v*` tag after CI passes to publish a GitHub release containing a source
+archive of this repo.
