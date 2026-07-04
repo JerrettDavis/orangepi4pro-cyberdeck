@@ -40,11 +40,11 @@ install -m 0755 /dev/stdin /usr/local/bin/codex-attach <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
 
-if ! tmux has-session -t ${tmux_session} 2>/dev/null; then
-  systemctl start orangepi-codex-resume.service || true
+if ! sudo -n /usr/bin/tmux has-session -t ${tmux_session} 2>/dev/null; then
+  sudo -n /usr/bin/systemctl start orangepi-codex-resume.service || true
 fi
 
-exec tmux attach -t ${tmux_session}
+exec sudo -n /usr/bin/tmux attach -t ${tmux_session}
 EOF
 
 install -m 0755 /dev/stdin /usr/local/bin/codex-terminal-autostart <<'EOF'
@@ -81,10 +81,10 @@ for proc in xfce4-session xfdesktop xfce4-panel xfsettingsd; do
 done
 
 for _ in 1 2 3 4 5 6 7 8 9 10; do
-  if tmux has-session -t codex-orange 2>/dev/null; then
+  if sudo -n /usr/bin/tmux has-session -t codex-orange 2>/dev/null; then
     break
   fi
-  /usr/bin/systemctl start orangepi-codex-resume.service >/dev/null 2>&1 || true
+  sudo -n /usr/bin/systemctl start orangepi-codex-resume.service >/dev/null 2>&1 || true
   sleep 1
 done
 
@@ -100,17 +100,17 @@ run_terminal() {
 }
 
 if command -v xfce4-terminal >/dev/null 2>&1; then
-  run_terminal xfce4-terminal --disable-server --title="Codex Orange Pi" --command="/usr/local/bin/codex-attach" &
+  run_terminal xfce4-terminal --disable-server --title="Codex Orange Pi" --hold --command="/bin/bash -lc '/usr/local/bin/codex-attach; status=\$?; echo; echo codex-attach exited with status \$status; exec bash'" &
   exit 0
 fi
 
 if command -v x-terminal-emulator >/dev/null 2>&1; then
-  run_terminal x-terminal-emulator -e /usr/local/bin/codex-attach &
+  run_terminal x-terminal-emulator -e /bin/bash -lc '/usr/local/bin/codex-attach; status=$?; echo; echo codex-attach exited with status $status; exec bash' &
   exit 0
 fi
 
 if command -v xterm >/dev/null 2>&1; then
-  run_terminal xterm -T "Codex Orange Pi" -e /usr/local/bin/codex-attach &
+  run_terminal xterm -T "Codex Orange Pi" -e /bin/bash -lc '/usr/local/bin/codex-attach; status=$?; echo; echo codex-attach exited with status $status; exec bash' &
   exit 0
 fi
 
@@ -150,6 +150,12 @@ X-GNOME-Autostart-enabled=true
 EOF
 chown "$user_name:$user_name" "$user_home/.config/autostart/codex-orange.desktop"
 chmod 0644 "$user_home/.config/autostart/codex-orange.desktop"
+
+cat >/etc/sudoers.d/orangepi-codex-resume <<EOF
+${user_name} ALL=(root) NOPASSWD: /usr/bin/tmux has-session -t ${tmux_session}, /usr/bin/tmux attach -t ${tmux_session}, /usr/bin/systemctl start orangepi-codex-resume.service
+EOF
+chmod 0440 /etc/sudoers.d/orangepi-codex-resume
+visudo -cf /etc/sudoers.d/orangepi-codex-resume >/dev/null
 
 systemctl daemon-reload
 systemctl enable --now orangepi-codex-resume.service

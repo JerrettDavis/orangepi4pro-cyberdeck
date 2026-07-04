@@ -48,6 +48,14 @@ session. If it does not, attach manually:
 /usr/local/bin/codex-attach
 ```
 
+The desktop autostart runs as user `orangepi`, while the Codex tmux session is
+root-owned so it can continue the same privileged recovery workflow. The
+installer adds `/etc/sudoers.d/orangepi-codex-resume` with passwordless access
+only for the exact `tmux has-session`, `tmux attach`, and service-start
+commands needed by `/usr/local/bin/codex-attach`. The terminal launcher uses
+`xfce4-terminal --hold` so attach failures remain visible instead of closing
+the window immediately.
+
 If the service did not start, run:
 
 ```bash
@@ -62,6 +70,7 @@ The service uses:
 /usr/local/bin/codex-attach
 /usr/local/bin/codex-terminal-autostart
 /etc/systemd/system/orangepi-codex-resume.service
+/etc/sudoers.d/orangepi-codex-resume
 /home/orangepi/.config/autostart/codex-orange.desktop
 tmux session: codex-orange
 ```
