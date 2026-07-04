@@ -34,20 +34,25 @@ cp -a /home/orangepi/touchscreen-fix-src recovery-capture/touchscreen-fix-src
 ## Codex Resume After Reboot
 
 This machine starts a detached `tmux` session for the active Codex thread at
-boot through `orangepi-codex-resume.service`.
-
-After reboot:
+boot through `orangepi-codex-resume.service`. Install or refresh the service
+and XFCE terminal attach helper with:
 
 ```bash
-sudo su
-codex-attach
+sudo scripts/install-codex-resume-autostart.sh
+```
+
+After reboot, the XFCE autostart should open a terminal attached to the tmux
+session. If it does not, attach manually:
+
+```bash
+/usr/local/bin/codex-attach
 ```
 
 If the service did not start, run:
 
 ```bash
-orangepi-codex-resume
-codex-attach
+sudo systemctl start orangepi-codex-resume.service
+/usr/local/bin/codex-attach
 ```
 
 The service uses:
@@ -55,7 +60,9 @@ The service uses:
 ```text
 /usr/local/bin/orangepi-codex-resume
 /usr/local/bin/codex-attach
+/usr/local/bin/codex-terminal-autostart
 /etc/systemd/system/orangepi-codex-resume.service
+/home/orangepi/.config/autostart/codex-orange.desktop
 tmux session: codex-orange
 ```
 
